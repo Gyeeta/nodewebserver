@@ -1,0 +1,19 @@
+
+[
+	{
+		"user"		:	"admin",
+		"password"	:	"gyeeta",
+		"role"		:	[ "admin" ],
+		"comment"	:	"Users can specify the password directly in password field or the SHA256 of the password in pass_sha256 field : currently roles can be admin, readonly, readwrite"
+	},
+	{
+		"user"		:	"user1",
+		"password"	:	"pass1",
+		"role"		:	[ "readonly" ]
+	},
+	{
+		"user"		:	"user2",
+		"pass_sha256"	:	"1ba3d16e9881959f8c9a9762854f72c6e6321cdd44358a10a4e939033117eab9",
+		"role"		:	[ "readwrite" ]
+	}
+]

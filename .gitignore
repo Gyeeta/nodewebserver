@@ -1,3 +1,18 @@
+
+# Frontend build
+frontend
+
+# Binaries
+node
+oauth2-proxy
+
+# Misc
+yarn.lock
+
+
+
+### Default Github .gitignore entries follow
+
 # Logs
 logs
 *.log
