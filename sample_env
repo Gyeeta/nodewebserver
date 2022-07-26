@@ -18,8 +18,8 @@ CFG_JWTSECRET='SecretPassForCookie'
 CFG_USEHTTP=true
 
 # If CFG_USEHTTP=false, HTTPS will be used. Please specify CFG_TLSCERTFILE and CFG_TLSKEYFILE options
-# CFG_TLSCERTFILE=/home/krishna/projects/osproc/src/server/tmp/cert.pem
-# CFG_TLSKEYFILE=/home/krishna/projects/osproc/src/server/tmp/key.pem
+# CFG_TLSCERTFILE=/var/tmp/cert.pem
+# CFG_TLSKEYFILE=/var/tmp/key.pem
 
 CFG_LOGFILE='/tmp/gyeeta_webserver.log'
 
