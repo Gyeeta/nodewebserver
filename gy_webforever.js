@@ -11,14 +11,7 @@ const			MAX_CHILD_EXITS = 10, MAX_LOG_SZ = 30 * 1024 * 1024;
 const 			{logrotate} = require('./gyutil.js');
 
 const 			{initGlobalConfig} = require('./gyconfig.js');
-
-if (!process.env.WEBSERVER_CFG) {
-	console.error('No Valid Config File specified in WEBSERVER_CFG environment variable or .env file : Please specify a valid file path first');
-	process.exit(1);
-}
-
-const			gyconfig = initGlobalConfig(process.env.WEBSERVER_CFG, false /* isAlertAction */);
-
+const			gyconfig = initGlobalConfig(false /* printcfg */);
 
 process.on('SIGHUP', () => {
 	// console.log('Controlling Terminal has exited. But continuing...');

@@ -26,13 +26,7 @@ const 		chalk = require('chalk');
 		});
 
 const 		{initGlobalConfig} = require('./gyconfig.js');
-
-if (!process.env.WEBSERVER_CFG) {
-	console.error('No Valid Config File specified in WEBSERVER_CFG environment variable or .env file : Please specify a valid file path first');
-	process.exit(1);
-}
-
-const		gyconfig = initGlobalConfig(process.env.WEBSERVER_CFG, false /* isAlertAction */);
+const		gyconfig = initGlobalConfig();
 
 console.log(`Gyeeta Web Server Starting now for ${ gyconfig.useHTTP ? 'http://' : 'https://' }${gyconfig.NodeIP}:${gyconfig.NodePort} `);
 

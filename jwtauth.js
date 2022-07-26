@@ -36,21 +36,24 @@ function checkCache()
 
 function jwtInit()
 {
-	if (!gyconfig.jwtSecretFile && !gyconfig.jwtKeyFile) {
-		throw new Error('Mandatory JWT Secret or Key File not specified in global config : Please specify either of jwtSecretFile or jwtKeyFile ...');
+	if (!gyconfig.jwtSecret && !gyconfig.jwtKeyFile) {
+		throw new Error('Mandatory JWT Secret or Key File not specified in global config : Please specify either of jwtSecret or jwtKeyFile ...');
 	}	
 
-	const path = gyconfig.jwtSecretFile || gyconfig.jwtKeyFile;
+	if (!gyconfig.jwtSecret) {
+		try {
+			secretOrFile = fs.readFileSync(gyconfig.jwtKeyFile);
 
-	try {
-		secretOrFile = fs.readFileSync(path);
-
-		if (!secretOrFile || secretOrFile.length === 0) {
-			throw new Error(`Empty JWT Secret or Key File : ${path} : Please provide a valid configuration.`);
+			if (!secretOrFile || secretOrFile.length === 0) {
+				throw new Error(`Empty JWT Key File : ${gyconfig.jwtKeyFile} : Please provide a valid configuration.`);
+			}	
+		}
+		catch(e) {
+			throw new Error(`Failed to read JWT Key File : ${gyconfig.jwtKeyFile} : ${e}`);
 		}	
 	}
-	catch(e) {
-		throw new Error(`Failed to read JWT Secret or Key File : ${path} : ${e}`);
+	else {
+		secretOrFile = gyconfig.jwtSecret;
 	}	
 
 	jwtCache = new Map();

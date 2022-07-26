@@ -1,6 +1,26 @@
 
 
-NODE_ENV=production
+NODE_ENV='production'
 
-WEBSERVER_CFG=/tmp/webserver_main.json
+CFG_SHYAMA_HOSTS='[ "shyama1.local", "shyama2.local" ]'
+CFG_SHYAMA_PORTS='[ 10037, 10037 ]'
+
+CFG_LISTENER_IP='0.0.0.0'
+CFG_LISTENER_PORT=10039
+
+CFG_AUTHTYPE='basic'
+CFG_USERPASSFILE='/var/tmp/userpass.json'
+
+CFG_TOKENEXPIRY='1d'
+CFG_JWTSECRET='SecretPassForCookie'
+
+# Set CFG_USEHTTP=true for HTTP server and false for HTTPS
+CFG_USEHTTP=true
+
+# If CFG_USEHTTP=false, HTTPS will be used. Please specify CFG_TLSCERTFILE and CFG_TLSKEYFILE options
+# CFG_TLSCERTFILE=/home/krishna/projects/osproc/src/server/tmp/cert.pem
+# CFG_TLSKEYFILE=/home/krishna/projects/osproc/src/server/tmp/key.pem
+
+CFG_LOGFILE='/tmp/gyeeta_webserver.log'
+
 
