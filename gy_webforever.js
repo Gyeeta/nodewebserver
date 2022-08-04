@@ -34,7 +34,7 @@ let			nodeexits = 0, oauthexits = 0;
 
 nodechild = new (forever.Monitor)('gyapp.js', {
 	max		: MAX_CHILD_EXITS,
-	silent		: true,
+	silent		: gyconfig.logFile ? true : false,,
 	args		: [],
 	killTree	: true,		// Kill all children on exit
 

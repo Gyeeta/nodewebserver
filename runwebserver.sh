@@ -178,6 +178,8 @@ case "$1" in
 
 		shift 1
 
+		ulimit -c 0
+
 		( ./node ./gy_webforever.js "$@" &) &
 
 		sleep 5
