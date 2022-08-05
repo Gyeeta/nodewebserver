@@ -1,9 +1,11 @@
 
 'use strict';
 
-			require('dotenv').config();
-
 const			fs = require('fs');
+const	 		process = require('process');
+
+			require('dotenv').config({ path: process.env.CFG_ENV });
+
 const 			forever = require('forever-monitor');
 
 const			MAX_CHILD_EXITS = 10, MAX_LOG_SZ = 30 * 1024 * 1024;
@@ -46,7 +48,7 @@ nodechild = new (forever.Monitor)('gyapp.js', {
 nodechild.on('restart', function() {
 	// console.error('Restarting gyapp node server since exit detected');
 
-	if (!logtimer) {
+	if (!logtimer && gyconfig.logFile) {
 		logtimer = setInterval(logrotate, 10000, gyconfig.logFile, MAX_LOG_SZ);
 	}
 });
@@ -68,8 +70,9 @@ nodechild.on('exit:code', function(code) {
 
 nodechild.start();
 
-logtimer = setInterval(logrotate, 10000, gyconfig.logFile, MAX_LOG_SZ);
-
+if (gyconfig.logFile) {
+	logtimer = setInterval(logrotate, 10000, gyconfig.logFile, MAX_LOG_SZ);
+}
 
 if (gyconfig.authType !== 'basic' && (typeof(gyconfig.oauth2ProxyCommand) === 'string' || Array.isArray(gyconfig.oauth2ProxyCommand))) {
 
@@ -89,7 +92,7 @@ if (gyconfig.authType !== 'basic' && (typeof(gyconfig.oauth2ProxyCommand) === 's
 	oauthchild.on('restart', function() {
 		// console.error('Restarting oauth proxy server since exit detected');
 		
-		if (!oauthlogtimer) {
+		if (!oauthlogtimer && gyconfig.oauth2ProxyLogFile) {
 			oauthlogtimer = setInterval(logrotate, 10000, gyconfig.oauth2ProxyLogFile, MAX_LOG_SZ);
 		}
 	});
@@ -111,7 +114,9 @@ if (gyconfig.authType !== 'basic' && (typeof(gyconfig.oauth2ProxyCommand) === 's
 
 	oauthchild.start();
 
-	oauthlogtimer = setInterval(logrotate, 10000, gyconfig.oauth2ProxyLogFile, MAX_LOG_SZ);
+	if (gyconfig.oauth2ProxyLogFile) {
+		oauthlogtimer = setInterval(logrotate, 10000, gyconfig.oauth2ProxyLogFile, MAX_LOG_SZ);
+	}
 }	
 
 

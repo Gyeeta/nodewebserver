@@ -1,0 +1,10 @@
+
+.git
+.github
+.gitignore
+
+.*.sw[p-z]
+
+./buildcontainer.sh
+.env
+

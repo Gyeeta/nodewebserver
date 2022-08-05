@@ -1,11 +1,12 @@
 
 'use strict';
 
-		require('dotenv').config();
-
 const		http = require('http');
 const		https = require('https');
 const		fs = require('fs');
+const 		process = require('process');
+
+		require('dotenv').config({ path: process.env.CFG_ENV });
 
 const 		createError = require('http-errors');
 const 		express = require('express');
