@@ -1,7 +1,4 @@
 
-
-NODE_ENV='production'
-
 CFG_SHYAMA_HOSTS='[ "shyama1.local", "shyama2.local" ]'
 CFG_SHYAMA_PORTS='[ 10037, 10037 ]'
 

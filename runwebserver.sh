@@ -180,6 +180,10 @@ case "$1" in
 
 		ulimit -c 0
 
+		if [ "x""$NODE_ENV" = "x" ]; then
+			export NODE_ENV='production'
+		fi	
+
 		( ./node ./gy_webforever.js "$@" &) &
 
 		sleep 5
