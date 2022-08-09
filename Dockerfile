@@ -7,7 +7,7 @@ LABEL org.opencontainers.image.description="This container provides the Gyeeta W
 LABEL usage="docker run -td --rm --name gyeetawebserver --read-only -p 10039:10039  --env CFG_ENV=/tmp/cfg.env -v /HOST_PATH_TO_CFG/node_cfg.env:/tmp/cfg.env:ro --env CFG_USERPASSFILE=/tmp/userpass.json -v /HOST_PATH_TO_USERPASS/userpass.json:/tmp/userpass.json:ro <nodewebserver Image>"
 
 # LABEL for github repository link
-LABEL org.opencontainers.image.source="https://github.com/gyeeta/alertaction"
+LABEL org.opencontainers.image.source="https://github.com/gyeeta/nodewebserver"
 
 LABEL org.opencontainers.image.authors="https://github.com/gyeeta"
 
