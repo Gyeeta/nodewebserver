@@ -19,79 +19,93 @@ let			gusermap;
 
 function basicInit()
 {
+	const			env = process.env;
+
 	if (!gyconfig.userPassFile) {
-		throw new Error('Basic authentication method set but no User Password File (userPassFile) specified in global config');
-	}	
+		if (!env.CFG_ADMINPASSWORD) {
+			throw new Error('Basic authentication method set but no User Password File (userPassFile) or CFG_ADMINPASSWORD env specified in global config');
+		}	
+	}
 
 	try {
-		const userpass = fs.readFileSync(gyconfig.userPassFile);
+		const 			tmap = new Map();
 
-		if (!userpass || userpass.length === 0) {
-			throw new Error(`Empty Basic authentication User Password File : ${gyconfig.userPassFile} : Please provide a valid file.`);
-		}	
+		if (gyconfig.userPassFile) {
+			const userpass = fs.readFileSync(gyconfig.userPassFile);
 
-		let			tarr;
-
-		try {
-			tarr = JSON.parse(userpass);
-		}
-		catch(e) {
-			throw new Error(`Basic authentication User Password file ${gyconfig.userPassFile} not in JSON format - Please specify the config file in JSON format : ${e}`);
-		}	
-
-		if (!Array.isArray(tarr)) {
-			throw new Error(`Basic authentication User Password file ${gyconfig.userPassFile} not a JSON Array - Please specify the config file in a JSON Array format`);
-		}	
-
-		if (tarr.length === 0) {
-			throw new Error(`Basic authentication User Password file ${gyconfig.userPassFile} is an empty JSON Array - Please specify valid objects in the JSON Array`);
-		}	
-		else if (tarr.length > MAX_USERS) {
-			throw new Error(`Basic authentication User Password file ${gyconfig.userPassFile} Array has too many elements ${tarr.length} - Please specify max ${MAX_USERS} objects in the JSON Array`);
-		}	
-
-		const tmap = new Map();
-
-		for (let obj of tarr) {
-			if (safetypeof(obj) !== 'object') {
-				throw new Error(`Basic authentication User Passwod file ${gyconfig.userPassFile} JSON Array element not of object format...`);
+			if (!userpass || userpass.length === 0) {
+				throw new Error(`Empty Basic authentication User Password File : ${gyconfig.userPassFile} : Please provide a valid file.`);
 			}	
 
-			if ((!obj.user) || (!obj.password && !obj.pass_sha256)) {
-				throw new Error(`Basic authentication User Passwod file ${gyconfig.userPassFile} JSON Array element does not have mandatory property 'user' or either of 'password' or 'pass_sha256'`);
-			}	
+			let			tarr;
 
-			const			p = obj.password ? obj.password : obj.pass_sha256;
-			const			type = obj.password ? 'password' : 'pass_sha256';
-
-			if ((typeof obj.user !== 'string') || (typeof p !== 'string')) {
-				throw new Error(`Basic authentication User Passwod file ${gyconfig.userPassFile} JSON Array element does not have mandatory property in string format : 'user' or either of 'password' or 'pass_sha256'`);
+			try {
+				tarr = JSON.parse(userpass);
 			}
+			catch(e) {
+				throw new Error(`Basic authentication User Password file ${gyconfig.userPassFile} not in JSON format - Please specify the config file in JSON format : ${e}`);
+			}	
 
-			let			role;
+			if (!Array.isArray(tarr)) {
+				throw new Error(`Basic authentication User Password file ${gyconfig.userPassFile} not a JSON Array - Please specify the config file in a JSON Array format`);
+			}	
 
-			if (obj.role) {
-				if (Array.isArray(obj.role)) {
-					role = obj.role;
+			if (tarr.length === 0) {
+				throw new Error(`Basic authentication User Password file ${gyconfig.userPassFile} is an empty JSON Array - Please specify valid objects in the JSON Array`);
+			}	
+			else if (tarr.length > MAX_USERS) {
+				throw new Error(`Basic authentication User Password file ${gyconfig.userPassFile} Array has too many elements ${tarr.length} - Please specify max ${MAX_USERS} objects in the JSON Array`);
+			}	
+
+
+			for (let obj of tarr) {
+				if (safetypeof(obj) !== 'object') {
+					throw new Error(`Basic authentication User Passwod file ${gyconfig.userPassFile} JSON Array element not of object format...`);
+				}	
+
+				if ((!obj.user) || (!obj.password && !obj.pass_sha256)) {
+					throw new Error(`Basic authentication User Passwod file ${gyconfig.userPassFile} JSON Array element does not have mandatory property 'user' or either of 'password' or 'pass_sha256'`);
+				}	
+
+				const			p = obj.password ? obj.password : obj.pass_sha256;
+				const			type = obj.password ? 'password' : 'pass_sha256';
+
+				if ((typeof obj.user !== 'string') || (typeof p !== 'string')) {
+					throw new Error(`Basic authentication User Passwod file ${gyconfig.userPassFile} JSON Array element does not have mandatory property in string format : 'user' or either of 'password' or 'pass_sha256'`);
 				}
-				else if (typeof obj.role === 'string') {
-					role = [ obj.role ];
+
+				let			role;
+
+				if (obj.role) {
+					if (Array.isArray(obj.role)) {
+						role = obj.role;
+					}
+					else if (typeof obj.role === 'string') {
+						role = [ obj.role ];
+					}
+					else {
+						role = [ 'readonly' ]; 
+					}	
 				}
 				else {
 					role = [ 'readonly' ]; 
 				}	
-			}
-			else {
-				role = [ 'readonly' ]; 
-			}	
 
-			tmap.set(obj.user, { pass : p, type, role });
+				tmap.set(obj.user, { pass : p, type, role });
+			}
 		}
+
+		if (env.CFG_ADMINPASSWORD) {
+			tmap.set('admin', { pass : env.CFG_ADMINPASSWORD, role : [ 'admin' ] });
+		}	
 
 		gusermap = tmap;
 
 		console.log(`Basic User Password Authentication specified : Total of ${gusermap.size} entries specified`);
-
+		
+		if (env.CFG_ADMINPASSWORD) {
+			console.log('admin password set as per CFG_ADMINPASSWORD environment variable');
+		}	
 	}
 	catch(e) {
 		throw new Error(`Exception caught while reading Basic User Password authentication config from ${gyconfig.userPassFile} : ${e}`);

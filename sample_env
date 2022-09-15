@@ -6,6 +6,7 @@ CFG_LISTENER_IP='0.0.0.0'
 CFG_LISTENER_PORT=10039
 
 CFG_AUTHTYPE='basic'
+# User Password file see sample_userpass.json. Users can also pass CFG_ADMINPASSWORD separately in case CFG_USERPASSFILE not specified...
 CFG_USERPASSFILE='/var/tmp/userpass.json'
 
 CFG_TOKENEXPIRY='1d'

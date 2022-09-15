@@ -200,15 +200,18 @@ function initGlobalConfig(printcfg = true)
 
 	if (gyconfig.authType === 'basic') {
 		if (!gyconfig.userPassFile) {
-			console.error(`Invalid Gyeeta Webserver Config : Mandatory Config option 'CFG_USERPASSFILE' not specified for 'basic' authentication : `
-					+ `Please specify 'CFG_USERPASSFILE' path in .env : Check sample_userpass.json for a sample file`);
-			process.exit(1);
+			if (!env.CFG_ADMINPASSWORD) {
+				console.error(`Invalid Gyeeta Webserver Config : Mandatory Config option 'CFG_USERPASSFILE' not specified for 'basic' authentication : `
+						+ `Please specify 'CFG_USERPASSFILE' path in .env : Check sample_userpass.json for a sample file`);
+				process.exit(1);
+			}
 		}	
-
-		bstat = fs.statSync(gyconfig.userPassFile, { throwIfNoEntry : false } );
-		if (!bstat) {
-			console.error(`Invalid Gyeeta Webserver Config : Config option CFG_USERPASSFILE=${gyconfig.userPassFile} specified but file not found`);
-			process.exit(1);
+		else {
+			bstat = fs.statSync(gyconfig.userPassFile, { throwIfNoEntry : false } );
+			if (!bstat) {
+				console.error(`Invalid Gyeeta Webserver Config : Config option CFG_USERPASSFILE=${gyconfig.userPassFile} specified but file not found`);
+				process.exit(1);
+			}
 		}
 	}
 	
