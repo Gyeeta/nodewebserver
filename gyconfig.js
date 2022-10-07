@@ -138,6 +138,15 @@ function initGlobalConfig(printcfg = true)
 		}	
 	}	
 
+	if (env.CFG_TLSPASSPHRASE) {
+		if (env.CFG_TLSPASSPHRASE[0] !== '"') {
+			cstr += `"tlsPassPhrase" : "${env.CFG_TLSPASSPHRASE}",\n\t`;
+		}
+		else {
+			cstr += `"tlsPassPhrase" : ${env.CFG_TLSPASSPHRASE},\n\t`;
+		}	
+	}	
+
 	if (env.CFG_LOGFILE) {
 		if (env.CFG_LOGFILE[0] !== '"') {
 			cstr += `"logFile" : "${env.CFG_LOGFILE}",\n\t`;

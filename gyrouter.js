@@ -18,7 +18,7 @@ const 		gyconfig = require('./gyconfig.js').getGlobalConfig();
 const		jwt = require('./jwtauth.js');
 const		basicauth = require('./basicauth.js');
 
-const 		{GyeetaHandler, GyCommError, JsonMsgTypes, NodeMsgTypes, NodeQueryTypes, ErrorTypes} = require('./gyeeta_comm.js');
+const 		{GyeetaHandler, GyCommError, JsonMsgTypes, NodeMsgTypes, NodeQueryTypes} = require('./gyeeta_comm.js');
 const 		{GyWebCache} = require("./gy_webcache.js");
 const		{safetypeof, isEmptyObj, splitAndTrim, printResourceUsage} = require("./gyutil.js");
 
@@ -411,7 +411,7 @@ function getStartEndTimes(req, res, qry, point_in_time_ok = true)
 			let 		endtimeoffsetsec = Number(req.body.endtimeoffsetsec);
 
 			if (true === isNaN(starttimeoffsetsec)) {
-				res.status(400).end(JSON.stringify({error : ErrorTypes.ERR_INVALID_REQUEST, errmsg : `Invalid starttimeoffsetsec parameter : Not a Number : ${req.body.starttimeoffsetsec}`}));
+				res.status(400).end(JSON.stringify({error : 400, errmsg : `Invalid starttimeoffsetsec parameter : Not a Number : ${req.body.starttimeoffsetsec}`}));
 				console.error(`Invalid starttimeoffsetsec parameter : ${req.body.starttimeoffsetsec}`);
 				return null;
 			}	
@@ -420,7 +420,7 @@ function getStartEndTimes(req, res, qry, point_in_time_ok = true)
 			}	
 
 			if (true === isNaN(endtimeoffsetsec)) {
-				res.status(400).end(JSON.stringify({error : ErrorTypes.ERR_INVALID_REQUEST, errmsg : `Invalid endtimeoffsetsec parameter : Not a Number : ${req.body.endtimeoffsetsec}`}));
+				res.status(400).end(JSON.stringify({error : 400, errmsg : `Invalid endtimeoffsetsec parameter : Not a Number : ${req.body.endtimeoffsetsec}`}));
 				console.error(`Invalid endtimeoffsetsec parameter : ${req.body.endtimeoffsetsec}`);
 				return null;
 			}	
@@ -429,7 +429,7 @@ function getStartEndTimes(req, res, qry, point_in_time_ok = true)
 			}	
 
 			if (endtimeoffsetsec > starttimeoffsetsec) {
-				res.status(400).end(JSON.stringify({error : ErrorTypes.ERR_INVALID_REQUEST, errmsg : `endtimeoffsetsec cannot be greater than starttimeoffsetsec parameter`}));
+				res.status(400).end(JSON.stringify({error : 400, errmsg : `endtimeoffsetsec cannot be greater than starttimeoffsetsec parameter`}));
 				console.error(`endtimeoffsetsec > starttimeoffsetsec parameter : ${req.body.endtimeoffsetsec} : ${req.body.starttimeoffsetsec}`);
 				return null;
 			}	
@@ -447,26 +447,26 @@ function getStartEndTimes(req, res, qry, point_in_time_ok = true)
 			dend = moment(req.body.endtime, moment.ISO_8601);
 
 			if (false === dstart.isValid()) {
-				res.status(400).end(JSON.stringify({error : ErrorTypes.ERR_INVALID_REQUEST, errmsg : `Invalid starttime specified : ${req.body.starttime}`}));
+				res.status(400).end(JSON.stringify({error : 400, errmsg : `Invalid starttime specified : ${req.body.starttime}`}));
 				console.error(`Invalid starttime specified : ${req.body.starttime}`);
 				return null;
 			}	
 
 			if (false === dend.isValid()) {
-				res.status(400).end(JSON.stringify({error : ErrorTypes.ERR_INVALID_REQUEST, errmsg : `Invalid endtime specified : ${req.body.endtime}`}));
+				res.status(400).end(JSON.stringify({error : 400, errmsg : `Invalid endtime specified : ${req.body.endtime}`}));
 				console.error(`Invalid endtime specified : ${req.body.endtime}`);
 				return null;
 			}	
 
 			if (dend < dstart) {
-				res.status(400).end(JSON.stringify({error : ErrorTypes.ERR_INVALID_REQUEST, 
+				res.status(400).end(JSON.stringify({error : 400, 
 								errmsg : `Invalid endtime specified : endtime ${req.body.endtime} is less than starttime ${req.body.starttime}`}));
 				console.error(`Invalid endtime specified : endtime < starttime ${req.body.endtime}`);
 				return null;
 			}
 			else if (dstart > dcurr) {
 				if (dstart.unix() > dcurr.unix() + 50) {
-					res.status(400).end(JSON.stringify({error : ErrorTypes.ERR_INVALID_REQUEST, errmsg : `Invalid starttime specified : starttime ${req.body.starttime} is in future`}));
+					res.status(400).end(JSON.stringify({error : 400, errmsg : `Invalid starttime specified : starttime ${req.body.starttime} is in future`}));
 					console.error(`Invalid starttime specified : starttime in future ${req.body.starttime}`);
 					return null;
 				}	
@@ -495,13 +495,13 @@ function getStartEndTimes(req, res, qry, point_in_time_ok = true)
 			const		dcurr = moment();
 
 			if (false === dstart.isValid()) {
-				res.status(400).end(JSON.stringify({error : ErrorTypes.ERR_INVALID_REQUEST, errmsg : `Invalid starttime specified : ${req.body.starttime}`}));
+				res.status(400).end(JSON.stringify({error : 400, errmsg : `Invalid starttime specified : ${req.body.starttime}`}));
 				console.error(`Invalid starttime specified : ${req.body.starttime}`);
 				return null;
 			}	
 
 			if (dstart.unix() > dcurr.unix() + 15) {
-				res.status(400).end(JSON.stringify({error : ErrorTypes.ERR_INVALID_REQUEST, errmsg : `Invalid starttime specified : starttime ${req.body.starttime} is in future`}));
+				res.status(400).end(JSON.stringify({error : 400, errmsg : `Invalid starttime specified : starttime ${req.body.starttime} is in future`}));
 				console.error(`Invalid starttime specified : starttime in future ${req.body.starttime}`);
 				return null;
 			}	
@@ -518,13 +518,13 @@ function getStartEndTimes(req, res, qry, point_in_time_ok = true)
 			qry.pointintime	= true;
 		}
 		else {
-			res.status(400).end(JSON.stringify({error : ErrorTypes.ERR_INVALID_REQUEST, errmsg : `Missing endtime parameter`}));
+			res.status(400).end(JSON.stringify({error : 400, errmsg : `Missing endtime parameter`}));
 			console.error(`Missing endtime parameter`);
 			return null;
 		}	
 	}
 	else if (req.body.endtime) {
-		res.status(400).end(JSON.stringify({error : ErrorTypes.ERR_INVALID_REQUEST, errmsg : `Missing starttime parameter`}));
+		res.status(400).end(JSON.stringify({error : 400, errmsg : `Missing starttime parameter`}));
 		console.error(`Missing starttime parameter`);
 		return null;
 	}	
@@ -532,7 +532,7 @@ function getStartEndTimes(req, res, qry, point_in_time_ok = true)
 		let 		timeoffsetsec = Number(req.body.timeoffsetsec);
 
 		if (true === isNaN(timeoffsetsec)) {
-			res.status(400).end(JSON.stringify({error : ErrorTypes.ERR_INVALID_REQUEST, errmsg : `Invalid timeoffsetsec parameter : Not a Number : ${req.body.timeoffsetsec}`}));
+			res.status(400).end(JSON.stringify({error : 400, errmsg : `Invalid timeoffsetsec parameter : Not a Number : ${req.body.timeoffsetsec}`}));
 			console.error(`Invalid timeoffsetsec parameter : ${req.body.timeoffsetsec}`);
 			return null;
 		}	
@@ -541,7 +541,7 @@ function getStartEndTimes(req, res, qry, point_in_time_ok = true)
 		}	
 
 		if (timeoffsetsec > 2 * 365 * 24 * 3600) {
-			res.status(400).end(JSON.stringify({error : ErrorTypes.ERR_INVALID_REQUEST, errmsg : `Invalid timeoffsetsec parameter : Number too large : ${req.body.timeoffsetsec}`}));
+			res.status(400).end(JSON.stringify({error : 400, errmsg : `Invalid timeoffsetsec parameter : Number too large : ${req.body.timeoffsetsec}`}));
 			console.error(`Invalid timeoffsetsec parameter : ${req.body.timeoffsetsec}`);
 			return null;
 		}	
@@ -616,7 +616,7 @@ function handleQueryApi(req, res, qname, curr_query_cachesec, resp_callback)
 		if (false === multiquery) {
 			if (req.body.filter) {
 				if (typeof req.body.filter !== "string") {
-					res.status(400).end(JSON.stringify({error : ErrorTypes.ERR_INVALID_REQUEST, 
+					res.status(400).end(JSON.stringify({error : 400, 
 								errmsg : `Invalid filter type specified : ${typeof req.body.filter} : filter must be a string`}));
 					console.error(`Invalid filter data type specified`);
 					return null;
@@ -630,7 +630,7 @@ function handleQueryApi(req, res, qname, curr_query_cachesec, resp_callback)
 					qry.options = req.body.options;
 				}	
 				else {
-					res.status(400).end(JSON.stringify({error : ErrorTypes.ERR_INVALID_REQUEST, 
+					res.status(400).end(JSON.stringify({error : 400, 
 								errmsg : `Invalid options type specified : ${typeof req.body.options} : options must be a JSON Object`}));
 					console.error(`Invalid options data type specified`);
 					return null;
@@ -646,7 +646,7 @@ function handleQueryApi(req, res, qname, curr_query_cachesec, resp_callback)
 		const 			qrystr	= JSON.stringify(qry);
 
 		if (qrystr.length > MAX_QUERY_STRLEN) {
-			res.status(400).end(JSON.stringify({error : ErrorTypes.ERR_INVALID_REQUEST, 
+			res.status(400).end(JSON.stringify({error : 400, 
 							errmsg : `Max Query Length ${MAX_QUERY_STRLEN} exceeded : ${qrystr.length} : Please reduce the query size`}));
 			return;
 		}	
@@ -658,12 +658,12 @@ function handleQueryApi(req, res, qname, curr_query_cachesec, resp_callback)
 				if (req.body.madid === undefined) {
 
 					if (typeof req.body.parid !== 'string') {
-						res.status(400).end(JSON.stringify({error : ErrorTypes.ERR_INVALID_REQUEST, errmsg : `Invalid Partha ID parid parameter : ${req.body.parid}`}));
+						res.status(400).end(JSON.stringify({error : 400, errmsg : `Invalid Partha ID parid parameter : ${req.body.parid}`}));
 						return;
 					}
 
 					if (null === req.body.parid.match(parthaRegex)) {
-						res.status(400).end(JSON.stringify({error : ErrorTypes.ERR_INVALID_REQUEST, errmsg : `Invalid Partha ID parid parameter : ${req.body.parid}`}));
+						res.status(400).end(JSON.stringify({error : 400, errmsg : `Invalid Partha ID parid parameter : ${req.body.parid}`}));
 						return;
 					}
 
@@ -671,13 +671,13 @@ function handleQueryApi(req, res, qname, curr_query_cachesec, resp_callback)
 						madhava = shyamaHdlr.get_madhava_from_parthaid(req.body.parid);
 					}
 					catch(e) {
-						res.status(400).end(JSON.stringify({error : ErrorTypes.ERR_INVALID_REQUEST, errmsg : 'Invalid or Unknown Partha ID parid Parameter : ' + e}));
+						res.status(400).end(JSON.stringify({error : 400, errmsg : 'Invalid or Unknown Partha ID parid Parameter : ' + e}));
 						return;
 					}	
 				}	
 				else {
 					if (null === req.body.madid.match(madhavaRegex)) {
-						res.status(400).end(JSON.stringify({error : ErrorTypes.ERR_INVALID_REQUEST, errmsg : `Invalid Madhava ID madid parameter : ${req.body.madid}`}));
+						res.status(400).end(JSON.stringify({error : 400, errmsg : `Invalid Madhava ID madid parameter : ${req.body.madid}`}));
 						return;
 					}
 
@@ -685,7 +685,7 @@ function handleQueryApi(req, res, qname, curr_query_cachesec, resp_callback)
 						madhava = shyamaHdlr.get_madhava_from_madhavaid(req.body.madid);
 					}
 					catch(e) {
-						res.status(400).end(JSON.stringify({error : ErrorTypes.ERR_INVALID_REQUEST, errmsg : 'Invalid or Unknown Madhava ID madid Parameter : ' + e}));
+						res.status(400).end(JSON.stringify({error : 400, errmsg : 'Invalid or Unknown Madhava ID madid Parameter : ' + e}));
 						return;
 					}	
 				}	
@@ -732,7 +732,7 @@ function handleQueryApi(req, res, qname, curr_query_cachesec, resp_callback)
 			})
 			.catch((error) => {
 				console.error(`There has been an error in the API call for query '${qrystr}' : ${error}`)
-				res.status(500).end(JSON.stringify({error : ErrorTypes.ERR_SERV_ERROR, errmsg : `${error}`}));
+				res.status(500).end(JSON.stringify({error : 500, errmsg : `${error}`}));
 			})
 			.catch((error) => {
 				console.error(`Error while handling catch exception : ${error}`)
@@ -742,7 +742,7 @@ function handleQueryApi(req, res, qname, curr_query_cachesec, resp_callback)
 	catch (e) {
 		console.error(`Query handling for "${qname}" caused an exception ${e} : \n${e?.stack}`);
 
-		res.status(500).end(JSON.stringify({error : ErrorTypes.ERR_SERV_ERROR, errmsg : `Exception caught : ${e}`}));
+		res.status(500).end(JSON.stringify({error : 500, errmsg : `Exception caught : ${e}`}));
 	}	
 }	
 
@@ -756,12 +756,12 @@ function handleCRUDapi(req, res, qname, mtype, jsontype, data, is_madhava_qry, a
 		qtype 			= apicall.api;
 
 		if (!(qtype > NodeQueryTypes.NN_MIN_TYPE && qtype < NodeQueryTypes.NM_MULTI_QUERY)) {
-			res.status(500).end(JSON.stringify({error : ErrorTypes.ERR_SERV_ERROR, errmsg : `Internal Error : Invalid qname specified : ${qname} for CRUD operation`}));
+			res.status(500).end(JSON.stringify({error : 500, errmsg : `Internal Error : Invalid qname specified : ${qname} for CRUD operation`}));
 			return;
 		}	
 
 		if (mtype !== NodeMsgTypes.NODE_MSG_ADD && mtype !== NodeMsgTypes.NODE_MSG_UPDATE && mtype !== NodeMsgTypes.NODE_MSG_DELETE) {
-			res.status(500).end(JSON.stringify({error : ErrorTypes.ERR_SERV_ERROR, errmsg : `Internal Route Error : Invalid mtype specified : ${mtype} for ${qname} CRUD operation`}));
+			res.status(500).end(JSON.stringify({error : 500, errmsg : `Internal Route Error : Invalid mtype specified : ${mtype} for ${qname} CRUD operation`}));
 			return;
 		}
 
@@ -788,7 +788,7 @@ function handleCRUDapi(req, res, qname, mtype, jsontype, data, is_madhava_qry, a
 		const 			qrystr	= JSON.stringify(qry);
 
 		if (qrystr.length > MAX_QUERY_STRLEN) {
-			res.status(400).end(JSON.stringify({error : ErrorTypes.ERR_INVALID_REQUEST, 
+			res.status(400).end(JSON.stringify({error : 400, 
 								errmsg : `Max Query Length ${MAX_QUERY_STRLEN} exceeded : ${qrystr.length} : Please reduce the query size`}));
 			return;
 		}	
@@ -798,7 +798,7 @@ function handleCRUDapi(req, res, qname, mtype, jsontype, data, is_madhava_qry, a
 		if (is_madhava_qry) {
 			if (typeof data.madid === 'string') {
 				if (null === data.madid.match(madhavaRegex)) {
-					res.status(400).end(JSON.stringify({error : ErrorTypes.ERR_INVALID_REQUEST, errmsg : `Invalid Madhava ID madid parameter : ${data.madid} for ${qname}`}));
+					res.status(400).end(JSON.stringify({error : 400, errmsg : `Invalid Madhava ID madid parameter : ${data.madid} for ${qname}`}));
 					return;
 				}
 
@@ -806,7 +806,7 @@ function handleCRUDapi(req, res, qname, mtype, jsontype, data, is_madhava_qry, a
 					madhava = shyamaHdlr.get_madhava_from_madhavaid(data.madid);
 				}
 				catch(e) {
-					res.status(400).end(JSON.stringify({error : ErrorTypes.ERR_INVALID_REQUEST, errmsg : 'Invalid Madhava ID madid Parameter : ' + e}));
+					res.status(400).end(JSON.stringify({error : 400, errmsg : 'Invalid Madhava ID madid Parameter : ' + e}));
 					return;
 				}	
 			}
@@ -814,7 +814,7 @@ function handleCRUDapi(req, res, qname, mtype, jsontype, data, is_madhava_qry, a
 				madfilterarr = data.madfilterarr;
 			}	
 			else if (!allow_all_madhava) {
-				res.status(400).end(JSON.stringify({error : ErrorTypes.ERR_INVALID_REQUEST, errmsg : `Missing Madhava ID madid parameter for CRUD Madhava related request for ${qname}`}));
+				res.status(400).end(JSON.stringify({error : 400, errmsg : `Missing Madhava ID madid parameter for CRUD Madhava related request for ${qname}`}));
 				return;
 			}	
 		}
@@ -846,7 +846,7 @@ function handleCRUDapi(req, res, qname, mtype, jsontype, data, is_madhava_qry, a
 		})
 		.catch((error) => {
 			console.error(`There has been an error in the CRUD API call for query '${qrystr}' : ${error}`)
-			res.status(500).end(JSON.stringify({error : ErrorTypes.ERR_SERV_ERROR, errmsg : `${error}`}));
+			res.status(500).end(JSON.stringify({error : 500, errmsg : `${error}`}));
 		})
 		.catch((error) => {
 			console.error(`Error while handling catch exception : ${error}`)
@@ -855,7 +855,7 @@ function handleCRUDapi(req, res, qname, mtype, jsontype, data, is_madhava_qry, a
 	catch (e) {
 		console.error(`CRUD Query handling for ${qname} caused an exception ${e} : \n${e?.stack}`);
 
-		res.status(500).end(JSON.stringify({error : ErrorTypes.ERR_SERV_ERROR, errmsg : `Exception caught : ${e}`}));
+		res.status(500).end(JSON.stringify({error : 500, errmsg : `Exception caught : ${e}`}));
 	}	
 }
 
@@ -895,7 +895,7 @@ function handleNodeLocalQuery(req, res, qname, api_call, cachesec, resp_callback
 			})
 			.catch((error) => {
 				console.error(`There has been an error in the API call for query '${qrystr}' : ${error}`)
-				res.status(500).end(JSON.stringify({error : ErrorTypes.ERR_SERV_ERROR, errmsg : `${error}`}));
+				res.status(500).end(JSON.stringify({error : 500, errmsg : `${error}`}));
 			})
 			.catch((error) => {
 				console.error(`Error while handling catch exception : ${error}`)
@@ -905,7 +905,7 @@ function handleNodeLocalQuery(req, res, qname, api_call, cachesec, resp_callback
 	catch (e) {
 		console.error(`Query handling for "${qname}" caused an exception ${e} : \n${e?.stack}`);
 
-		res.status(500).end(JSON.stringify({error : ErrorTypes.ERR_SERV_ERROR, errmsg : `Exception caught : ${e}`}));
+		res.status(500).end(JSON.stringify({error : 500, errmsg : `Exception caught : ${e}`}));
 	}	
 }
 
@@ -993,7 +993,7 @@ function validateUser(req, res, next)
 	catch(e) {
 		console.error(`Exception caught while checking auth headers : ${e}`);
 
-		res.status(500).end(JSON.stringify({error : ErrorTypes.ERR_SERV_ERROR, errmsg : `Exception caught : ${e}`}));
+		res.status(500).end(JSON.stringify({error : 500, errmsg : `Exception caught : ${e}`}));
 	}	
 }	
 
@@ -1484,7 +1484,7 @@ function crudAlertAck(req, res)
 	if (!req.body || true === isEmptyObj(req.body)) {
 
 		res.type('json');
-		res.status(400).end(JSON.stringify({status : 'failed', error : ErrorTypes.ERR_INVALID_REQUEST, errmsg : 'Missing JSON Payload : Empty payload not valid'}));
+		res.status(400).end(JSON.stringify({status : 'failed', error : 400, errmsg : 'Missing JSON Payload : Empty payload not valid'}));
 		return;
 	}
 	
@@ -1514,7 +1514,7 @@ router.post('/v1/alertdef/add', [validateUser, validateReadWriteRole], function(
 	if (!req.body || true === isEmptyObj(req.body)) {
 
 		res.type('json');
-		res.status(400).end(JSON.stringify({status : 'failed', error : ErrorTypes.ERR_INVALID_REQUEST, errmsg : 'Missing JSON Payload : Empty payload not valid'}));
+		res.status(400).end(JSON.stringify({status : 'failed', error : 400, errmsg : 'Missing JSON Payload : Empty payload not valid'}));
 		return;
 	}
 
@@ -1526,7 +1526,7 @@ router.post('/v1/alertdef/update', [validateUser, validateReadWriteRole], functi
 	if (!req.body || true === isEmptyObj(req.body)) {
 
 		res.type('json');
-		res.status(400).end(JSON.stringify({status : 'failed', error : ErrorTypes.ERR_INVALID_REQUEST, errmsg : 'Missing JSON Payload : Empty payload not valid'}));
+		res.status(400).end(JSON.stringify({status : 'failed', error : 400, errmsg : 'Missing JSON Payload : Empty payload not valid'}));
 		return;
 	}
 
@@ -1538,7 +1538,7 @@ router.post('/v1/alertdef/delete', [validateUser, validateReadWriteRole], functi
 	if (!req.body || true === isEmptyObj(req.body)) {
 
 		res.type('json');
-		res.status(400).end(JSON.stringify({status : 'failed', error : ErrorTypes.ERR_INVALID_REQUEST, errmsg : 'Missing JSON Payload : Empty payload not valid'}));
+		res.status(400).end(JSON.stringify({status : 'failed', error : 400, errmsg : 'Missing JSON Payload : Empty payload not valid'}));
 		return;
 	}
 
@@ -1550,7 +1550,7 @@ router.put('/v1/alertdef', [validateUser, validateReadWriteRole], function(req, 
 	if (!req.body || true === isEmptyObj(req.body)) {
 
 		res.type('json');
-		res.status(400).end(JSON.stringify({status : 'failed', error : ErrorTypes.ERR_INVALID_REQUEST, errmsg : 'Missing JSON Payload : Empty payload not valid'}));
+		res.status(400).end(JSON.stringify({status : 'failed', error : 400, errmsg : 'Missing JSON Payload : Empty payload not valid'}));
 		return;
 	}
 
@@ -1562,7 +1562,7 @@ router.put('/v1/alertdef/:adefid', [validateUser, validateReadWriteRole], functi
 	if (!req.body || true === isEmptyObj(req.body)) {
 
 		res.type('json');
-		res.status(400).end(JSON.stringify({status : 'failed', error : ErrorTypes.ERR_INVALID_REQUEST, errmsg : 'Missing JSON Payload : Empty payload not valid'}));
+		res.status(400).end(JSON.stringify({status : 'failed', error : 400, errmsg : 'Missing JSON Payload : Empty payload not valid'}));
 		return;
 	}
 
@@ -1608,7 +1608,7 @@ router.post('/v1/inhibits/add', [validateUser, validateReadWriteRole], function(
 	if (!req.body || true === isEmptyObj(req.body)) {
 
 		res.type('json');
-		res.status(400).end(JSON.stringify({status : 'failed', error : ErrorTypes.ERR_INVALID_REQUEST, errmsg : 'Missing JSON Payload : Empty payload not valid'}));
+		res.status(400).end(JSON.stringify({status : 'failed', error : 400, errmsg : 'Missing JSON Payload : Empty payload not valid'}));
 		return;
 	}
 
@@ -1620,7 +1620,7 @@ router.post('/v1/inhibits/update', [validateUser, validateReadWriteRole], functi
 	if (!req.body || true === isEmptyObj(req.body)) {
 
 		res.type('json');
-		res.status(400).end(JSON.stringify({status : 'failed', error : ErrorTypes.ERR_INVALID_REQUEST, errmsg : 'Missing JSON Payload : Empty payload not valid'}));
+		res.status(400).end(JSON.stringify({status : 'failed', error : 400, errmsg : 'Missing JSON Payload : Empty payload not valid'}));
 		return;
 	}
 
@@ -1632,7 +1632,7 @@ router.post('/v1/inhibits/delete', [validateUser, validateReadWriteRole], functi
 	if (!req.body || true === isEmptyObj(req.body)) {
 
 		res.type('json');
-		res.status(400).end(JSON.stringify({status : 'failed', error : ErrorTypes.ERR_INVALID_REQUEST, errmsg : 'Missing JSON Payload : Empty payload not valid'}));
+		res.status(400).end(JSON.stringify({status : 'failed', error : 400, errmsg : 'Missing JSON Payload : Empty payload not valid'}));
 		return;
 	}
 
@@ -1644,7 +1644,7 @@ router.put('/v1/inhibits', [validateUser, validateReadWriteRole], function(req, 
 	if (!req.body || true === isEmptyObj(req.body)) {
 
 		res.type('json');
-		res.status(400).end(JSON.stringify({status : 'failed', error : ErrorTypes.ERR_INVALID_REQUEST, errmsg : 'Missing JSON Payload : Empty payload not valid'}));
+		res.status(400).end(JSON.stringify({status : 'failed', error : 400, errmsg : 'Missing JSON Payload : Empty payload not valid'}));
 		return;
 	}
 
@@ -1656,7 +1656,7 @@ router.put('/v1/inhibits/:inhid', [validateUser, validateReadWriteRole], functio
 	if (!req.body || true === isEmptyObj(req.body)) {
 
 		res.type('json');
-		res.status(400).end(JSON.stringify({status : 'failed', error : ErrorTypes.ERR_INVALID_REQUEST, errmsg : 'Missing JSON Payload : Empty payload not valid'}));
+		res.status(400).end(JSON.stringify({status : 'failed', error : 400, errmsg : 'Missing JSON Payload : Empty payload not valid'}));
 		return;
 	}
 
@@ -1704,7 +1704,7 @@ router.post('/v1/silences/add', [validateUser, validateReadWriteRole], function(
 	if (!req.body || true === isEmptyObj(req.body)) {
 
 		res.type('json');
-		res.status(400).end(JSON.stringify({status : 'failed', error : ErrorTypes.ERR_INVALID_REQUEST, errmsg : 'Missing JSON Payload : Empty payload not valid'}));
+		res.status(400).end(JSON.stringify({status : 'failed', error : 400, errmsg : 'Missing JSON Payload : Empty payload not valid'}));
 		return;
 	}
 
@@ -1716,7 +1716,7 @@ router.post('/v1/silences/update', [validateUser, validateReadWriteRole], functi
 	if (!req.body || true === isEmptyObj(req.body)) {
 
 		res.type('json');
-		res.status(400).end(JSON.stringify({status : 'failed', error : ErrorTypes.ERR_INVALID_REQUEST, errmsg : 'Missing JSON Payload : Empty payload not valid'}));
+		res.status(400).end(JSON.stringify({status : 'failed', error : 400, errmsg : 'Missing JSON Payload : Empty payload not valid'}));
 		return;
 	}
 
@@ -1728,7 +1728,7 @@ router.post('/v1/silences/delete', [validateUser, validateReadWriteRole], functi
 	if (!req.body || true === isEmptyObj(req.body)) {
 
 		res.type('json');
-		res.status(400).end(JSON.stringify({status : 'failed', error : ErrorTypes.ERR_INVALID_REQUEST, errmsg : 'Missing JSON Payload : Empty payload not valid'}));
+		res.status(400).end(JSON.stringify({status : 'failed', error : 400, errmsg : 'Missing JSON Payload : Empty payload not valid'}));
 		return;
 	}
 
@@ -1740,7 +1740,7 @@ router.put('/v1/silences', [validateUser, validateReadWriteRole], function(req, 
 	if (!req.body || true === isEmptyObj(req.body)) {
 
 		res.type('json');
-		res.status(400).end(JSON.stringify({status : 'failed', error : ErrorTypes.ERR_INVALID_REQUEST, errmsg : 'Missing JSON Payload : Empty payload not valid'}));
+		res.status(400).end(JSON.stringify({status : 'failed', error : 400, errmsg : 'Missing JSON Payload : Empty payload not valid'}));
 		return;
 	}
 
@@ -1752,7 +1752,7 @@ router.put('/v1/silences/:silid', [validateUser, validateReadWriteRole], functio
 	if (!req.body || true === isEmptyObj(req.body)) {
 
 		res.type('json');
-		res.status(400).end(JSON.stringify({status : 'failed', error : ErrorTypes.ERR_INVALID_REQUEST, errmsg : 'Missing JSON Payload : Empty payload not valid'}));
+		res.status(400).end(JSON.stringify({status : 'failed', error : 400, errmsg : 'Missing JSON Payload : Empty payload not valid'}));
 		return;
 	}
 
@@ -1799,7 +1799,7 @@ router.post('/v1/actions/add', [validateUser, validateAdmin], function(req, res)
 	if (!req.body || true === isEmptyObj(req.body)) {
 
 		res.type('json');
-		res.status(400).end(JSON.stringify({status : 'failed', error : ErrorTypes.ERR_INVALID_REQUEST, errmsg : 'Missing JSON Payload : Empty payload not valid'}));
+		res.status(400).end(JSON.stringify({status : 'failed', error : 400, errmsg : 'Missing JSON Payload : Empty payload not valid'}));
 		return;
 	}
 
@@ -1811,7 +1811,7 @@ router.post('/v1/actions/update', [validateUser, validateAdmin], function(req, r
 	if (!req.body || true === isEmptyObj(req.body)) {
 
 		res.type('json');
-		res.status(400).end(JSON.stringify({status : 'failed', error : ErrorTypes.ERR_INVALID_REQUEST, errmsg : 'Missing JSON Payload : Empty payload not valid'}));
+		res.status(400).end(JSON.stringify({status : 'failed', error : 400, errmsg : 'Missing JSON Payload : Empty payload not valid'}));
 		return;
 	}
 
@@ -1823,7 +1823,7 @@ router.post('/v1/actions/delete', [validateUser, validateAdmin], function(req, r
 	if (!req.body || true === isEmptyObj(req.body)) {
 
 		res.type('json');
-		res.status(400).end(JSON.stringify({status : 'failed', error : ErrorTypes.ERR_INVALID_REQUEST, errmsg : 'Missing JSON Payload : Empty payload not valid'}));
+		res.status(400).end(JSON.stringify({status : 'failed', error : 400, errmsg : 'Missing JSON Payload : Empty payload not valid'}));
 		return;
 	}
 
@@ -1835,7 +1835,7 @@ router.put('/v1/actions', [validateUser, validateAdmin], function(req, res) {
 	if (!req.body || true === isEmptyObj(req.body)) {
 
 		res.type('json');
-		res.status(400).end(JSON.stringify({status : 'failed', error : ErrorTypes.ERR_INVALID_REQUEST, errmsg : 'Missing JSON Payload : Empty payload not valid'}));
+		res.status(400).end(JSON.stringify({status : 'failed', error : 400, errmsg : 'Missing JSON Payload : Empty payload not valid'}));
 		return;
 	}
 
@@ -1847,7 +1847,7 @@ router.put('/v1/actions/:actionid', [validateUser, validateAdmin], function(req,
 	if (!req.body || true === isEmptyObj(req.body)) {
 
 		res.type('json');
-		res.status(400).end(JSON.stringify({status : 'failed', error : ErrorTypes.ERR_INVALID_REQUEST, errmsg : 'Missing JSON Payload : Empty payload not valid'}));
+		res.status(400).end(JSON.stringify({status : 'failed', error : 400, errmsg : 'Missing JSON Payload : Empty payload not valid'}));
 		return;
 	}
 
@@ -1962,7 +1962,7 @@ function querySubsys(req, res)
 {
 	try {
 		if (typeof req.body.subsys !== 'string') {
-			res.status(400).end(JSON.stringify({error : ErrorTypes.ERR_INVALID_REQUEST, errmsg : `Subsystem Query Request with missing or invalid subsys param`}));
+			res.status(400).end(JSON.stringify({error : 400, errmsg : `Subsystem Query Request with missing or invalid subsys param`}));
 			return;
 		}
 
@@ -1971,7 +1971,7 @@ function querySubsys(req, res)
 		const			apicall = subsysToApiCall[req.body.subsys];
 
 		if (!apicall) {
-			res.status(400).end(JSON.stringify({error : ErrorTypes.ERR_INVALID_REQUEST, errmsg : `Subsystem Query Request with invalid subsys param '${req.body.subsys}'`}));
+			res.status(400).end(JSON.stringify({error : 400, errmsg : `Subsystem Query Request with invalid subsys param '${req.body.subsys}'`}));
 			return;
 		}	
 
@@ -1980,7 +1980,7 @@ function querySubsys(req, res)
 	catch (e) {
 		console.error(`Query returned exception ${e} : \n${e?.stack}`);
 
-		res.status(500).end(JSON.stringify({error : ErrorTypes.ERR_SERV_ERROR, errmsg : `Exception caught : ${e}`}));
+		res.status(500).end(JSON.stringify({error : 500, errmsg : `Exception caught : ${e}`}));
 	}	
 }
 
@@ -2002,7 +2002,7 @@ function multiquery(req, res)
 {
 	try {
 		if (!req.body.multiqueryarr || (false === Array.isArray(req.body.multiqueryarr)) || (req.body.multiqueryarr.length === 0)) {
-			res.status(400).end(JSON.stringify({error : ErrorTypes.ERR_INVALID_REQUEST, errmsg : `Multi Query Request with missing or invalid multiqueryarr param`}));
+			res.status(400).end(JSON.stringify({error : 400, errmsg : `Multi Query Request with missing or invalid multiqueryarr param`}));
 			return;
 		}
 
@@ -2010,7 +2010,7 @@ function multiquery(req, res)
 		let		tobj = {}, mincache = 15 * 60;
 
 		if (qarr.length > 8) {
-			res.status(400).end(JSON.stringify({error : ErrorTypes.ERR_INVALID_REQUEST, errmsg : `Multi Query Request with invalid multiqueryarr param : Max multi queries limited to 8 currently`}));
+			res.status(400).end(JSON.stringify({error : 400, errmsg : `Multi Query Request with invalid multiqueryarr param : Max multi queries limited to 8 currently`}));
 			return;
 		}
 
@@ -2018,27 +2018,27 @@ function multiquery(req, res)
 
 		for (let qobj of qarr) {
 			if (safetypeof(qobj) !== 'object') {
-				res.status(400).end(JSON.stringify({error : ErrorTypes.ERR_INVALID_REQUEST, errmsg : `Multi Query Request with invalid multiqueryarr param : Not an object`}));
+				res.status(400).end(JSON.stringify({error : 400, errmsg : `Multi Query Request with invalid multiqueryarr param : Not an object`}));
 				return;
 			}	
 
 			if (!qobj.qname || safetypeof(qobj.qname) !== 'string') {
-				res.status(400).end(JSON.stringify({error : ErrorTypes.ERR_INVALID_REQUEST, errmsg : `Multi Query Request with invalid multiqueryarr param : qname field missing or invalid`}));
+				res.status(400).end(JSON.stringify({error : 400, errmsg : `Multi Query Request with invalid multiqueryarr param : qname field missing or invalid`}));
 				return;
 			}
 
 			if (!qobj.qid || safetypeof(qobj.qid) !== 'string') {
-				res.status(400).end(JSON.stringify({error : ErrorTypes.ERR_INVALID_REQUEST, errmsg : `Multi Query Request with invalid multiqueryarr param : qid field not present or invalid`}));
+				res.status(400).end(JSON.stringify({error : 400, errmsg : `Multi Query Request with invalid multiqueryarr param : qid field not present or invalid`}));
 				return;
 			}
 
 			if (qobj.qid.length >= 32) {
-				res.status(400).end(JSON.stringify({error : ErrorTypes.ERR_INVALID_REQUEST, errmsg : `Multi Query Request with invalid multiqueryarr param : qid field name too long`}));
+				res.status(400).end(JSON.stringify({error : 400, errmsg : `Multi Query Request with invalid multiqueryarr param : qid field name too long`}));
 				return;
 			}	
 
 			if (tobj[qobj.qid] !== undefined) {
-				res.status(400).end(JSON.stringify({error : ErrorTypes.ERR_INVALID_REQUEST, errmsg : `Multi Query Request with invalid multiqueryarr param : qid ${qobj.qid} repeated`}));
+				res.status(400).end(JSON.stringify({error : 400, errmsg : `Multi Query Request with invalid multiqueryarr param : qid ${qobj.qid} repeated`}));
 				return;
 			}	
 
@@ -2047,7 +2047,7 @@ function multiquery(req, res)
 			let			apicall = NodeQueryCalls[qobj.qname.toLowerCase()];
 
 			if (apicall === undefined || apicall.api === NodeQueryTypes.NM_MULTI_QUERY) {
-				res.status(400).end(JSON.stringify({error : ErrorTypes.ERR_INVALID_REQUEST, errmsg : `Multi Query Request with invalid multiqueryarr array param type ${qobj.qname}`}));
+				res.status(400).end(JSON.stringify({error : 400, errmsg : `Multi Query Request with invalid multiqueryarr array param type ${qobj.qname}`}));
 				return;
 			}
 
@@ -2072,7 +2072,7 @@ function multiquery(req, res)
 	catch (e) {
 		console.error(`Query returned exception ${e} : \n${e?.stack}`);
 
-		res.status(500).end(JSON.stringify({error : ErrorTypes.ERR_SERV_ERROR, errmsg : `Exception caught : ${e}`}));
+		res.status(500).end(JSON.stringify({error : 500, errmsg : `Exception caught : ${e}`}));
 	}	
 }
 
@@ -2214,7 +2214,7 @@ function nodeParthaInfo(req, res)
 	catch (e) {
 		console.error(`Query returned exception ${e} : \n${e?.stack}`);
 
-		res.status(500).end(JSON.stringify({error : ErrorTypes.ERR_SERV_ERROR, errmsg : `Exception caught : ${e}`}));
+		res.status(500).end(JSON.stringify({error : 500, errmsg : `Exception caught : ${e}`}));
 	}	
 }
 
@@ -2277,7 +2277,7 @@ function nodeclusterlist(req, res)
 	catch (e) {
 		console.error(`Query returned exception ${e} : \n${e?.stack}`);
 
-		res.status(500).end(JSON.stringify({error : ErrorTypes.ERR_SERV_ERROR, errmsg : `Exception caught : ${e}`}));
+		res.status(500).end(JSON.stringify({error : 500, errmsg : `Exception caught : ${e}`}));
 	}	
 }
 
@@ -2362,6 +2362,24 @@ router.get('/v1/loginuserinfo', [validateUser], function(req, res) {
 		effrole 	: req.effrole, 
 		authType	: gyconfig.authType,
 	}));
+});	
+
+
+// Health Probe (No User Validation)
+router.get('/v1/healthz', function(req, res) {
+	try {
+		const			shyamaHdlr = gyeetaHdlr.get_shyama_handler();
+		
+		if (true === shyamaHdlr.is_shyama_conn_available()) {
+			res.status(200).end(JSON.stringify({status : 'ok'}));
+		}	
+		else {
+			res.status(500).end(JSON.stringify({error : 500, errmsg : 'No connections exist to Shyama server'}));
+		}	
+	}
+	catch (e) {
+		res.status(500).end(JSON.stringify({error : 500, errmsg : `Exception caught : ${e}`}));
+	}	
 });	
 
 

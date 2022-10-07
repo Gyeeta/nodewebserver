@@ -19,6 +19,10 @@ CFG_USEHTTP=true
 # CFG_TLSCERTFILE=/var/tmp/cert.pem
 # CFG_TLSKEYFILE=/var/tmp/key.pem
 
-CFG_LOGFILE='/tmp/gyeeta_webserver.log'
+# If TLS Private Key is encrypted using Pass Phrase
+# CFG_TLSPASSPHRASE='TLSPassPhrase'
+
+# If log needs to be directed to a file
+# CFG_LOGFILE='/tmp/gyeeta_webserver.log'
 
 
