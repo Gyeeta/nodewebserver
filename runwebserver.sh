@@ -51,9 +51,9 @@ print_version()
 
 print_complete_set()
 {
-printf "\n\n		Complete Set of Options : \n"
+echo -e "\n\n		Complete Set of Options : \n"
 
-printf "	
+echo -e "	
 	ps 	restart 	start		stop 	version 
 
 	For Help on any option : please type 
@@ -68,7 +68,7 @@ printf "
 
 printusage()
 {
-printf "\n\n ------------------  Usage  -------------------\n"
+echo -e "\n\n ------------------  Usage  -------------------\n"
 print_start
 print_stop
 print_ps
@@ -102,7 +102,7 @@ gy_pgrep()
 	if [ -n "$IS_FOUND" ]; then
 		GLOB_PGREP_PID="$IS_FOUND"
 		if [ $GLOB_PRINT_PID -eq 1 ]; then
-			printf "$IS_FOUND"
+			echo -e "$IS_FOUND"
 		fi	
 	fi
 }
@@ -114,8 +114,8 @@ node_start_validate()
 
 	gy_pgrep
 	if [ -n "$GLOB_PGREP_PID" ]; then
-		printf "\nNOTE : Gyeeta Webserver component(s) already running : PID(s) $GLOB_PGREP_PID\n\n"
-		printf "Please run \"$0 restart\" if you need to restart the components...\n\n"
+		echo -e "\nNOTE : Gyeeta Webserver component(s) already running : PID(s) $GLOB_PGREP_PID\n\n"
+		echo -e "Please run \"$0 restart\" if you need to restart the components...\n\n"
 
 		exit 1
 	fi
@@ -136,17 +136,18 @@ if [ $? -eq 0 ]; then
 fi
 
 if [ ! -f ./node ]; then 
-	printf "\n\nERROR : Binary node not found in dir $PWD. Please run from a proper install...\n\n"
+	echo -e "\n\nERROR : Binary node not found in dir $PWD. Please run from a proper install...\n\n"
 	exit 1
 elif [ ! -f ./gyapp.js ] || [ ! -f ./gy_webforever.js ]; then
-	printf "\n\nERROR : Required files gyapp.js or gy_webforever.js not found in dir $PWD. Please run from a proper install...\n\n"
+	echo -e "\n\nERROR : Required files gyapp.js or gy_webforever.js not found in dir $PWD. Please run from a proper install...\n\n"
 	exit 1
 fi
+
+export LD_LIBRARY_PATH=`pwd`/libs:$LD_LIBRARY_PATH
 
 ARGV_ARRAY=("$@") 
 ARGC_CNT=${#ARGV_ARRAY[@]} 
  
-
 case "$1" in 
 
 	help | -h | --help | \?)
@@ -160,7 +161,7 @@ case "$1" in
 			do	
 				print_"$opt" 2> /dev/null
 				if [ $? -ne 0 ]; then
-					printf "\nERROR : Invalid Option $opt...\n\n"
+					echo -e "\nERROR : Invalid Option $opt...\n\n"
 					exit 1
 				fi
 
@@ -174,7 +175,7 @@ case "$1" in
 
 		node_start_validate
 
-		printf "\n\tStarting Gyeeta Webserver components...\n\n"
+		echo -e "\n\tStarting Gyeeta Webserver components...\n\n"
 
 		shift 1
 
@@ -184,6 +185,15 @@ case "$1" in
 			export NODE_ENV='production'
 		fi	
 
+		if [ -n "$GY_FOREGROUND" ]; then
+			echo -e "\nRunning Webserver in foreground as GY_FOREGROUND env set...\n"
+
+			exec ./node ./gy_webforever.js "$@" 
+
+			echo -e "\n\nERROR : Failed to execute node Webserver process. Exiting...\n"
+			exit 1
+		fi
+
 		( ./node ./gy_webforever.js "$@" &) &
 
 		sleep 5
@@ -192,7 +202,7 @@ case "$1" in
 
 		gy_pgrep 
 		if [ -z "$GLOB_PGREP_PID" ]; then
-			printf "\n\tERROR : Gyeeta Webserver process not running. Please check log for ERRORs if no errors already printed...\n\n"
+			echo -e "\n\tERROR : Gyeeta Webserver process not running. Please check log for ERRORs if no errors already printed...\n\n"
 			exit 1
 		fi
 
@@ -203,7 +213,7 @@ case "$1" in
 	
 	stop)
 
-		printf "\n\tStopping Gyeeta Webserver components : "
+		echo -e "\n\tStopping Gyeeta Webserver components : "
 
 		gy_pgrep 
 		[ -n "$GLOB_PGREP_PID" ] && kill $GLOB_PGREP_PID 2> /dev/null
@@ -214,12 +224,12 @@ case "$1" in
 			gy_pgrep 
 			
 			if [ -n "$GLOB_PGREP_PID" ]; then
-				printf "\n\t[ERROR]: Gyeeta Webserver process $GLOB_PGREP_PID not yet exited. Sending SIGKILL...\n\n"
+				echo -e "\n\t[ERROR]: Gyeeta Webserver process $GLOB_PGREP_PID not yet exited. Sending SIGKILL...\n\n"
 				kill -KILL $GLOB_PGREP_PID
 			fi	
 		fi	
 
-		printf "\n\n\tStopped all components successfully...\n\n"
+		echo -e "\n\n\tStopped all components successfully...\n\n"
 
 		exit 0
 
@@ -228,17 +238,17 @@ case "$1" in
 
 	ps)
 
-		printf "\n\tPID status of Gyeeta Webserver package components : "
+		echo -e "\n\tPID status of Gyeeta Webserver package components : "
 
 		GLOB_PRINT_PID=1
 
-		printf "\n\n\tGyeeta Webserver PID(s) : "
+		echo -e "\n\n\tGyeeta Webserver PID(s) : "
 		gy_pgrep 
 		
 		if [ -n "$GLOB_PGREP_PID" ]; then
-			printf "\n\n\n\tAll Components Running : Yes\n\n"
+			echo -e "\n\n\n\tAll Components Running : Yes\n\n"
 		else
-			printf "\n\n\n\tAll Components Running : No\n\n"
+			echo -e "\n\n\n\tAll Components Running : No\n\n"
 		fi	
 
 		exit 0
