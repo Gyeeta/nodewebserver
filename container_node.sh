@@ -26,7 +26,7 @@ if [ "$CMD" = "start" ] || [ "$CMD" = "restart" ]; then
 		exit 1
 	fi	
 
-	while `true`; do
+	while true; do
 		sleep 30
 
 		./runwebserver.sh ps
@@ -36,9 +36,6 @@ if [ "$CMD" = "start" ] || [ "$CMD" = "restart" ]; then
 			exit 1
 		fi	
 	done	
-
-	# Wait indefinitely
-	read /dev/null
 fi
 
 exit $?
