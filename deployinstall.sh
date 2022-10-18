@@ -21,7 +21,7 @@ if [ $? -ne 0 ]; then
 	exit 1
 fi
 
-rm -Rf $ODIR/.git
+rm -Rf $ODIR/{.git,buildcontainer.sh,container_node.sh,Dockerfile,deployinstall.sh}
 
 echo -e "\nInstalled nodewebserver to $ODIR successfully...\n"
 
