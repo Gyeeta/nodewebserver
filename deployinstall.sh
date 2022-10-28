@@ -1,4 +1,6 @@
-#!/bin/bash
+#!/bin/bash -x
+
+shopt -s dotglob
 
 if [ -z "$1" ]; then
 	echo -e "\n\nUsage : $0 <Install Base Dir>\n\n"
@@ -14,6 +16,8 @@ if [ ! -d $ODIR ]; then
 	exit 1
 fi	
 	
+rm -rf $ODIR 2> /dev/null	
+	
 cp -a . $ODIR
 
 if [ $? -ne 0 ]; then
@@ -21,7 +25,7 @@ if [ $? -ne 0 ]; then
 	exit 1
 fi
 
-rm -Rf $ODIR/{.git,buildcontainer.sh,container_node.sh,Dockerfile,deployinstall.sh}
+rm -Rf $ODIR/{.git,.gitignore,buildcontainer.sh,container_node.sh,Dockerfile,.dockerignore,deployinstall.sh}
 
 echo -e "\nInstalled nodewebserver to $ODIR successfully...\n"
 
