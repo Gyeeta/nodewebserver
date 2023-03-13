@@ -35,8 +35,8 @@ const JsonMsgTypes = {
 const		RESP_WEB_JSON		= 1000;
 const 		RESP_JSON_WITH_HEADER	= 1;
 
-const		NODE_VERSION		= 0x000200;
-const		NODE_VERSION_STR	= '0.2.0';
+const		NODE_VERSION		= 0x000300;
+const		NODE_VERSION_STR	= '0.3.0';
 const		MIN_SHYAMA_VERSION	= 0x000200;
 const		MIN_MADHAVA_VERSION	= 0x000200;
 const		COMM_VERSION		= 1;
