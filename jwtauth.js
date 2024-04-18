@@ -16,7 +16,7 @@ const			MAX_JWT_CACHE = 1024, MAX_TOKEN_LEN = 2048;
 const			tokenExpiry = gyconfig.tokenExpiry || '3d';
 let			jwtCache, secretOrFile;
 
-const			adminRegex = /\badmin\b/i, readwriteRegex = /\breadwrite\b/i;
+const			adminRegex = /\badmin\b/i, managerRegex = /\bmanager\b/i, readwriteRegex = /\breadwrite\b/i;
 
 
 function checkCache()
@@ -68,6 +68,9 @@ function getEffectiveRole(rolearr)
 			if (adminRegex.test(rolearr)) {
 				return 'admin';
 			}	
+			else if (managerRegex.test(rolearr)) {
+				return 'manager';
+			}	
 			else if (readwriteRegex.test(rolearr)) {
 				return 'readwrite';
 			}	
@@ -76,16 +79,23 @@ function getEffectiveRole(rolearr)
 		return 'readonly';
 	}	
 
-	let			isreadwrite;
+	let			ismanager, isreadwrite;
 
 	for (let role of rolearr) {
 		if (adminRegex.test(role)) {
 			return 'admin';
 		}	
+		else if (managerRegex.test(rolearr)) {
+			ismanager = true;
+		}	
 		else if (readwriteRegex.test(rolearr)) {
 			isreadwrite = true;
 		}	
 	}	
+
+	if (ismanager) {
+		return 'manager';
+	}
 
 	if (isreadwrite) {
 		return 'readwrite';

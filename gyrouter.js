@@ -59,7 +59,6 @@ const NodeQueryCalls = {
 	procinfo	: { api : NodeQueryTypes.NM_PROC_INFO, 		mincache : 60,	maxcache : 600,	is_madhava_qry : true, },
 	procstate	: { api : NodeQueryTypes.NM_PROC_STATE, 	mincache : 3,	maxcache : 600,	is_madhava_qry : true, },
 	extprocstate	: { api : NodeQueryTypes.NM_EXTPROCSTATE, 	mincache : 3,	maxcache : 600,	is_madhava_qry : true, },
-
 	clusterstate	: { api : NodeQueryTypes.NM_CLUSTER_STATE, 	mincache : 3,	maxcache : 600,	is_madhava_qry : false, },
 	svcmeshclust	: { api : NodeQueryTypes.NS_SVC_MESH_CLUST, 	mincache : 100,	maxcache : 600,	is_madhava_qry : false, },
 	svcipclust	: { api : NodeQueryTypes.NS_SVC_IP_CLUST, 	mincache : 100,	maxcache : 600,	is_madhava_qry : false, },
@@ -75,6 +74,14 @@ const NodeQueryCalls = {
 	madhavalist	: { api : NodeQueryTypes.NS_MADHAVA_LIST, 	mincache : 30,	maxcache : 30,	is_madhava_qry : false, },
 	madhavastatus	: { api : NodeQueryTypes.NM_MADHAVASTATUS,	mincache : 30,	maxcache : 30,	is_madhava_qry : true, },
 	parthalist	: { api : NodeQueryTypes.NM_PARTHALIST,		mincache : 30,	maxcache : 30,	is_madhava_qry : true, },
+
+	tracereq	: { api : NodeQueryTypes.NM_TRACEREQ,		mincache : 5,	maxcache : 600,	is_madhava_qry : true, },
+	exttracereq	: { api : NodeQueryTypes.NM_EXTTRACEREQ,	mincache : 5,	maxcache : 600,	is_madhava_qry : true, },
+	traceconn	: { api : NodeQueryTypes.NM_TRACECONN,		mincache : 5,	maxcache : 600,	is_madhava_qry : true, },
+	traceuniq	: { api : NodeQueryTypes.NM_TRACEUNIQ,		mincache : 100,	maxcache : 600,	is_madhava_qry : true, },
+	tracedef	: { api : NodeQueryTypes.NS_TRACEDEF, 		mincache : 10,	maxcache : 10,	is_madhava_qry : false, },
+	tracestatus	: { api : NodeQueryTypes.NM_TRACESTATUS,	mincache : 30,	maxcache : 30,	is_madhava_qry : true, },
+	tracehistory	: { api : NodeQueryTypes.NM_TRACEHISTORY,	mincache : 10,	maxcache : 300,	is_madhava_qry : true, },
 
 	multiquery	: { api : NodeQueryTypes.NM_MULTI_QUERY, 	mincache : 3,	maxcache : 10,	is_madhava_qry : true },		// Keep this last
 };	
@@ -108,6 +115,13 @@ const subsysToApiCall = {
 	shyamastatus	:	'shyamastatus',
 	madhavastatus	:	'madhavastatus',
 	parthalist	:	'parthalist',
+	tracereq	:	'tracereq',
+	exttracereq	:	'exttracereq',
+	traceconn	:	'traceconn',
+	traceuniq	:	'traceuniq',
+	tracedef	:	'tracedef',
+	tracestatus	:	'tracestatus',
+	tracehistory	:	'tracehistory',
 };	
 
 function validateQueryCalls()
@@ -910,6 +924,19 @@ function handleNodeLocalQuery(req, res, qname, api_call, cachesec, resp_callback
 }
 
 
+/*
+ * There are 4 levels of Auth Role Rights in decreasing order of significance :
+ *
+ * admin, manager, readwrite and lastly readonly
+ * 
+ * admin is the superuser - allows all including adding, deleting users, etc.
+ *
+ * manager allows adding, updating Alert Actions, Request Tracing, etc.
+ *
+ * readwrite allows adding, updating Alerts
+ *
+ * readonly is for the rest...
+ */
 
 function validateUser(req, res, next)
 {
@@ -1008,9 +1035,21 @@ function validateAdmin(req, res, next)
 	}	
 }	
 
+function validateManagerRole(req, res, next)
+{
+	if (req.effrole === 'manager' || req.effrole === 'admin') {
+		return next();
+	}
+	else {
+		res.status(403).end(JSON.stringify({error :  403, errmsg : 'Require Manager Role'}));
+		return;
+	}	
+}	
+
+
 function validateReadWriteRole(req, res, next)
 {
-	if (req.effrole === 'readwrite' || req.effrole === 'admin') {
+	if (req.effrole === 'readwrite' || req.effrole === 'manager' || req.effrole === 'admin') {
 		return next();
 	}
 	else {
@@ -1794,7 +1833,7 @@ function queryActions(req, res)
 	handleQueryApi(req, res, "actions");
 }
 
-router.post('/v1/actions/add', [validateUser, validateAdmin], function(req, res) { 
+router.post('/v1/actions/add', [validateUser, validateManagerRole], function(req, res) { 
 
 	if (!req.body || true === isEmptyObj(req.body)) {
 
@@ -1806,7 +1845,7 @@ router.post('/v1/actions/add', [validateUser, validateAdmin], function(req, res)
 	crudActions(req, res, NodeMsgTypes.NODE_MSG_ADD, req.body);
 });
 
-router.post('/v1/actions/update', [validateUser, validateAdmin], function(req, res) { 
+router.post('/v1/actions/update', [validateUser, validateManagerRole], function(req, res) { 
 
 	if (!req.body || true === isEmptyObj(req.body)) {
 
@@ -1818,7 +1857,7 @@ router.post('/v1/actions/update', [validateUser, validateAdmin], function(req, r
 	crudActions(req, res, NodeMsgTypes.NODE_MSG_UPDATE, req.body);
 });
 
-router.post('/v1/actions/delete', [validateUser, validateAdmin], function(req, res) { 
+router.post('/v1/actions/delete', [validateUser, validateManagerRole], function(req, res) { 
 
 	if (!req.body || true === isEmptyObj(req.body)) {
 
@@ -1830,7 +1869,7 @@ router.post('/v1/actions/delete', [validateUser, validateAdmin], function(req, r
 	crudActions(req, res, NodeMsgTypes.NODE_MSG_DELETE, req.body);
 });
 
-router.put('/v1/actions', [validateUser, validateAdmin], function(req, res) { 
+router.put('/v1/actions', [validateUser, validateManagerRole], function(req, res) { 
 
 	if (!req.body || true === isEmptyObj(req.body)) {
 
@@ -1842,7 +1881,7 @@ router.put('/v1/actions', [validateUser, validateAdmin], function(req, res) {
 	crudActions(req, res, NodeMsgTypes.NODE_MSG_ADD, req.body);
 });
 
-router.put('/v1/actions/:actionid', [validateUser, validateAdmin], function(req, res) { 
+router.put('/v1/actions/:actionid', [validateUser, validateManagerRole], function(req, res) { 
 
 	if (!req.body || true === isEmptyObj(req.body)) {
 
@@ -1854,7 +1893,7 @@ router.put('/v1/actions/:actionid', [validateUser, validateAdmin], function(req,
 	crudActions(req, res, NodeMsgTypes.NODE_MSG_UPDATE, req.body);
 });
 
-router.delete('/v1/actions/:actionid', [validateUser, validateAdmin], function(req, res) { 
+router.delete('/v1/actions/:actionid', [validateUser, validateManagerRole], function(req, res) { 
 
 	crudActions(req, res, NodeMsgTypes.NODE_MSG_DELETE, req.params);
 });
@@ -1938,6 +1977,209 @@ router.get('/v1/parthalist', [validateUser], function(req, res) {
 function parthalist(req, res) 
 {
 	handleQueryApi(req, res, "parthalist");
+}
+
+router.post('/v1/tracereq', [validateUser], tracereq);	
+
+router.get('/v1/tracereq', [validateUser], function(req, res) {
+	if (req.query) {
+		req.body = req.query;
+	}
+	else {
+		req.body = {};
+	}	
+
+	tracereq(req, res);
+});	
+
+function tracereq(req, res) 
+{
+	handleQueryApi(req, res, "tracereq");
+}
+
+router.post('/v1/exttracereq', [validateUser], exttracereq);	
+
+router.get('/v1/exttracereq', [validateUser], function(req, res) {
+	if (req.query) {
+		req.body = req.query;
+	}
+	else {
+		req.body = {};
+	}	
+
+	exttracereq(req, res);
+});	
+
+function exttracereq(req, res) 
+{
+	handleQueryApi(req, res, "exttracereq");
+}
+
+router.post('/v1/traceconn', [validateUser], traceconn);	
+
+router.get('/v1/traceconn', [validateUser], function(req, res) {
+	if (req.query) {
+		req.body = req.query;
+	}
+	else {
+		req.body = {};
+	}	
+
+	traceconn(req, res);
+});	
+
+function traceconn(req, res) 
+{
+	handleQueryApi(req, res, "traceconn");
+}
+
+
+router.post('/v1/traceuniq', [validateUser], traceuniq);	
+
+router.get('/v1/traceuniq', [validateUser], function(req, res) {
+	if (req.query) {
+		req.body = req.query;
+	}
+	else {
+		req.body = {};
+	}	
+
+	traceuniq(req, res);
+});	
+
+function traceuniq(req, res) 
+{
+	handleQueryApi(req, res, "traceuniq");
+}
+
+router.get('/v1/tracedef', [validateUser], function(req, res) {
+	if (req.query) {
+		req.body = req.query;
+	}
+	else {
+		req.body = {};
+	}	
+
+	queryTracedef(req, res);
+});	
+
+router.post('/v1/tracedef', [validateUser], queryTracedef);	
+
+function queryTracedef(req, res) 
+{
+	handleQueryApi(req, res, "tracedef");
+}
+
+router.post('/v1/tracedef/add', [validateUser, validateManagerRole], function(req, res) { 
+
+	if (!req.body || true === isEmptyObj(req.body)) {
+
+		res.type('json');
+		res.status(400).end(JSON.stringify({status : 'failed', error : 400, errmsg : 'Missing JSON Payload : Empty payload not valid'}));
+		return;
+	}
+
+	crudTracedef(req, res, NodeMsgTypes.NODE_MSG_ADD, req.body);
+});
+
+router.post('/v1/tracedef/update', [validateUser, validateManagerRole], function(req, res) { 
+
+	if (!req.body || true === isEmptyObj(req.body)) {
+
+		res.type('json');
+		res.status(400).end(JSON.stringify({status : 'failed', error : 400, errmsg : 'Missing JSON Payload : Empty payload not valid'}));
+		return;
+	}
+
+	crudTracedef(req, res, NodeMsgTypes.NODE_MSG_UPDATE, req.body);
+});
+
+router.post('/v1/tracedef/delete', [validateUser, validateManagerRole], function(req, res) { 
+
+	if (!req.body || true === isEmptyObj(req.body)) {
+
+		res.type('json');
+		res.status(400).end(JSON.stringify({status : 'failed', error : 400, errmsg : 'Missing JSON Payload : Empty payload not valid'}));
+		return;
+	}
+
+	crudTracedef(req, res, NodeMsgTypes.NODE_MSG_DELETE, req.body);
+});
+
+router.put('/v1/tracedef', [validateUser, validateManagerRole], function(req, res) { 
+
+	if (!req.body || true === isEmptyObj(req.body)) {
+
+		res.type('json');
+		res.status(400).end(JSON.stringify({status : 'failed', error : 400, errmsg : 'Missing JSON Payload : Empty payload not valid'}));
+		return;
+	}
+
+	crudTracedef(req, res, NodeMsgTypes.NODE_MSG_ADD, req.body);
+});
+
+router.put('/v1/tracedef/:defid', [validateUser, validateManagerRole], function(req, res) { 
+
+	if (!req.body || true === isEmptyObj(req.body)) {
+
+		res.type('json');
+		res.status(400).end(JSON.stringify({status : 'failed', error : 400, errmsg : 'Missing JSON Payload : Empty payload not valid'}));
+		return;
+	}
+
+	crudTracedef(req, res, NodeMsgTypes.NODE_MSG_UPDATE, req.body);
+});
+
+router.post('/v1/tracedef/:defid/tend/:tend', [validateUser, validateManagerRole], function(req, res) { 
+
+	crudTracedef(req, res, NodeMsgTypes.NODE_MSG_UPDATE, req.params);
+});
+
+router.delete('/v1/tracedef/:defid', [validateUser, validateManagerRole], function(req, res) { 
+
+	crudTracedef(req, res, NodeMsgTypes.NODE_MSG_DELETE, req.params);
+});
+
+function crudTracedef(req, res, mtype, data) 
+{
+	handleCRUDapi(req, res, "tracedef", mtype, JsonMsgTypes.CRUD_GENERIC_JSON, data, false, false);
+}
+
+
+router.post('/v1/tracestatus', [validateUser], tracestatus);	
+
+router.get('/v1/tracestatus', [validateUser], function(req, res) {
+	if (req.query) {
+		req.body = req.query;
+	}
+	else {
+		req.body = {};
+	}	
+
+	tracestatus(req, res);
+});	
+
+function tracestatus(req, res) 
+{
+	handleQueryApi(req, res, "tracestatus");
+}
+
+router.post('/v1/tracehistory', [validateUser], tracehistory);	
+
+router.get('/v1/tracehistory', [validateUser], function(req, res) {
+	if (req.query) {
+		req.body = req.query;
+	}
+	else {
+		req.body = {};
+	}	
+
+	tracehistory(req, res);
+});	
+
+function tracehistory(req, res) 
+{
+	handleQueryApi(req, res, "tracehistory");
 }
 
 
@@ -2300,6 +2542,7 @@ function currtime(req, res)
 {
 	const			m = moment();
 	
+	res.setHeader("Content-Type", "application/json");
 	res.status(200).end(JSON.stringify({
 		time_t 		: m.unix(), 
 		time 		: m.format(),
@@ -2316,6 +2559,7 @@ router.post('/v1/basicauth', checkIsBasicAuth, basicauth.handleBasicAuth);
 function checkIsBasicAuth(req, res, next)
 {
 	if (gyconfig.authType !== 'basic') {
+		res.setHeader("Content-Type", "application/json");
 		res.status(404).end(JSON.stringify({status : 'failed', error : 404, errmsg : 'Basic Authentication is disabled.'}));
 		return;
 	}	
@@ -2328,18 +2572,20 @@ router.get('/v1/reloaduserpass', [validateUser, validateAdmin], function(req, re
 	const			tnow = Date.now();
 
 	if (gyconfig.authType !== 'basic') {
+		res.setHeader("Content-Type", "application/json");
 		res.status(404).end(JSON.stringify({status : 'failed', error : 404, errmsg : 'Basic Authentication is disabled.'}));
 		return;
 	}	
 
 	if (tnow > gtlastpassword + 30 * 1000) {
-		gtlastpassword = tnow;
-
 		console.log('Reloading Basic Authentication User Passwords as reloaduserpass request seen...');
 
 		try {
 			basicauth.basicInit();
 
+			gtlastpassword = tnow;
+
+			res.setHeader("Content-Type", "application/json");
 			res.status(200).end(JSON.stringify({status : 'ok', msg : 'Reloaded User Password Configuration'}));
 		}
 		catch(e) {
@@ -2347,10 +2593,12 @@ router.get('/v1/reloaduserpass', [validateUser, validateAdmin], function(req, re
 
 			console.error(chalk.red(errmsg));
 
+			res.setHeader("Content-Type", "application/json");
 			res.status(400).end(JSON.stringify({status : 'failed', error : 400, errmsg}));
 		}	
 	}
 	else {
+		res.setHeader("Content-Type", "application/json");
 		res.status(429).end(JSON.stringify({status : 'failed', error : 429, errmsg : 'Please try again after a few seconds'}));
 	}	
 });	
@@ -2371,9 +2619,11 @@ router.get('/v1/healthz', function(req, res) {
 		const			shyamaHdlr = gyeetaHdlr.get_shyama_handler();
 		
 		if (true === shyamaHdlr.is_shyama_conn_available()) {
+			res.setHeader("Content-Type", "application/json");
 			res.status(200).end(JSON.stringify({status : 'ok'}));
 		}	
 		else {
+			res.setHeader("Content-Type", "application/json");
 			res.status(500).end(JSON.stringify({error : 500, errmsg : 'No connections exist to Shyama server'}));
 		}	
 	}
