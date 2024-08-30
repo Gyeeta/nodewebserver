@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
 
-FROM ubuntu:18.04
+FROM ubuntu:20.04
 
 LABEL org.opencontainers.image.description="This container provides the Gyeeta Web Server. Inputs needed include : \
 1. Config file which specifies various params such as Shyama Servers, Auth Password file, etc. \
